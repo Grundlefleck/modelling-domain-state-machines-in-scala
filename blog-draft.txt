@@ -1,0 +1,27 @@
+Recently, in our team's journey in event-sourcing one of our products, I arrived at a solution for modelling a state machine representing a key aspect of our domain. Obviously I'm biased, but I think it's clean, elegant and simple, and worth sharing. The result code which is reasonably well-typed, provides a model of a state machine, and prevents errors such as invalid transitions. It happened to be implemented in Scala.
+
+For this post I'll use a simplistic model of an account at a retail bank. In reality we used it to implement the lifecyle of a trade in an FX market.
+
+
+Consider this description of some of the features and rules of our bank account:
+ - a customer can apply for an account, but must supply some mandatory personal information, and be approved
+ - once the application process is complete, the account is open for use by the customer
+ - a customer may deposit and withdraw their money
+ - the account accrues interest daily based on its balance
+ - a customer may close their account at any time, at which point any remaining balance is returned to them
+ 
+ A state diagram for this model could look something like this:
+ [insert picture]
+ 
+ Let's also assume a couple of things about our implementation:
+  - it receives events representing "facts" about what operations have been performed
+  - it calculates its own balance based on transactions and accruals (safe in the knowledge that there's a real transaction log persisted somewhere else)
+  - the main API the model is used for is to identify itself as open and provide the balance (i.e. it has something equivalent to an isOpen() and getBalance() methods)
+  
+We could implement the state model with fields of a class to represent its data and current state. Something like this:
+
+TODO: show an implementation with untyped transitions from state to state and fields that start out as null and are filled in
+TODO: show implementation with typed transitions where state objects hold the current information
+
+
+TODO: include link to event-driven finite state machine on wikipedia, which demonstrates the problem [http://en.wikipedia.org/wiki/Event-driven_finite-state_machine]
