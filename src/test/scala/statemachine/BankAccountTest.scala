@@ -2,16 +2,27 @@ package statemachine
 
 import org.scalatest.FlatSpec
 import org.scalatest.Matchers
-import statemachine.domainstatemachine.BankAccount_StateMachine
-import statemachine.statepattern.BankAccount_SimpleFields
+import statemachine.v1.BankAccount_Nulls
+import statemachine.v3.BankAccount_StateMachine
+import statemachine.v2.BankAccount_SimpleFields
+import statemachine.v4.BankAccount_PreventInvalidTransitionsStartingPoint
 
 class BankAccountTest extends FlatSpec with BankAccountBehaviours with Matchers {
 
-  def bankAccountWithSimpleFields = BankAccount_SimpleFields(None, None, None)
-  def bankAccountWithStateMachine = BankAccount_StateMachine(domainstatemachine.Initial)
+  def bankAccountWithNulls = {
+    val nullCustomerInfo: CustomerInfo = null.asInstanceOf[CustomerInfo]
+    val nullAccountId: AccountId = null.asInstanceOf[AccountId]
+    val nullBalance: Balance = null.asInstanceOf[Balance]
+    BankAccount_Nulls(nullCustomerInfo, nullAccountId, nullBalance, v1.Initial)
+  }
+  def bankAccountWithSimpleFields = BankAccount_SimpleFields(None, None, None, v2.Initial)
+  def bankAccountWithStateMachine = BankAccount_StateMachine(v3.Initial)
+  def bankAccountPreventingInvalidTransitions = v4.BankAccount_PreventInvalidTransitionsStartingPoint.start()
 
+  "A bank account implemented with nulls " should behave like bankAccount(bankAccountWithNulls)
   "A bank account implemented with simple field reassignment " should behave like bankAccount(bankAccountWithSimpleFields)
   "A bank account implemented as a state machine" should behave like bankAccount(bankAccountWithStateMachine)
+  "A bank account implemented to prevent invalid transitions" should behave like bankAccount(bankAccountPreventingInvalidTransitions)
 }
 
 trait BankAccountBehaviours extends Matchers { this: FlatSpec =>
